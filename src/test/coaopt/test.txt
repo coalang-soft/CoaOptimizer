@@ -1,0 +1,4 @@
+load println
+putI 8
+__invoke1
+pop
