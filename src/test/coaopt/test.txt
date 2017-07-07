@@ -1,4 +1,6 @@
-load println
-putI 8
+load java
+putS java.lang.System
 __invoke1
+get out
+get println
 pop

@@ -5,6 +5,6 @@ package io.github.coalangsoft.cclproject.opt;
  */
 public enum InstructionCategory {
 
-    POP_NOUSE, PUT_NOCHANGE, INVOKE, LOAD;
+    POP_NOUSE, PUT_NOCHANGE, INVOKE, LOAD, GET;
 
 }

@@ -10,7 +10,7 @@ public enum InstructionData {
     putI(InstructionCategory.PUT_NOCHANGE), putA(InstructionCategory.PUT_NOCHANGE), putS(InstructionCategory.PUT_NOCHANGE),
     __invoke0(InstructionCategory.INVOKE), __invoke1(InstructionCategory.INVOKE), __invoke2(InstructionCategory.INVOKE),
     load(InstructionCategory.LOAD), invoke(InstructionCategory.INVOKE),
-    __println_f(InstructionCategory.PUT_NOCHANGE);
+    __println_f(InstructionCategory.PUT_NOCHANGE), get(InstructionCategory.GET), __float(InstructionCategory.PUT_NOCHANGE);
 
     private final InstructionCategory category;
 
