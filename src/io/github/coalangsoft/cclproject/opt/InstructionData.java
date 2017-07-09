@@ -11,7 +11,7 @@ public enum InstructionData {
     __invoke0(InstructionCategory.INVOKE), __invoke1(InstructionCategory.INVOKE), __invoke2(InstructionCategory.INVOKE),
     load(InstructionCategory.LOAD), invoke(InstructionCategory.INVOKE),
     __println_f(InstructionCategory.PUT), get(InstructionCategory.GET), __float(InstructionCategory.PUT),
-    __java(InstructionCategory.JAVA);
+    __java(InstructionCategory.JAVA), putM(InstructionCategory.PUT);
 
     private final InstructionCategory category;
 

@@ -34,7 +34,8 @@ public class CoaOptTest {
                 new PrintlnInvokeOPT(),
                 new PrintlnLoadOPT(),
                 new PutPopOPT(),
-                new JavaConstantOPT()
+                new JavaConstantOPT(),
+                new WhileOPT()
         ).optimize(c, is);
         System.out.println(is);
 
