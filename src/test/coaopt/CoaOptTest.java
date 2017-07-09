@@ -10,6 +10,7 @@ import io.github.coalangsoft.cclproject.opt.systems.*;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -17,7 +18,7 @@ import java.util.List;
  */
 public class CoaOptTest {
 
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args) throws FileNotFoundException, NoSuchMethodException {
         ArrayList<Instruction> is = InstructionReader.read(CoaOptTest.class.getResourceAsStream("./test.txt"));
 
         SystemChange c = new SystemChange();
@@ -32,9 +33,11 @@ public class CoaOptTest {
                 new JavaOPT(),
                 new PrintlnInvokeOPT(),
                 new PrintlnLoadOPT(),
-                new PutPopOPT()
+                new PutPopOPT(),
+                new JavaConstantOPT()
         ).optimize(c, is);
         System.out.println(is);
+
         for(int i = 0; i < is.size(); i++){
             System.out.println(is.get(i).getRaw());
         }

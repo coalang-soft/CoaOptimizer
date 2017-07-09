@@ -22,10 +22,10 @@ public class PutPopOPT extends KnownSizeOptimizeRule {
         Instruction ins2 = instructions.get(1);
         if(
                 (
-                        ins1.getData().getCategory() == InstructionCategory.PUT_NOCHANGE ||
+                        ins1.getData().getCategory() == InstructionCategory.PUT ||
                         ins1.getData().getCategory() == InstructionCategory.LOAD
                 ) &&
-                (ins2.getData().getCategory() == InstructionCategory.POP_NOUSE)
+                (ins2.getData().getCategory() == InstructionCategory.POP)
         ){
             return new Instruction[0];
         }

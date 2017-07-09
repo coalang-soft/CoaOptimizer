@@ -26,7 +26,7 @@ public class PrintlnInvokeOPT extends KnownSizeOptimizeRule {
 
         if(
                 (ins1.getData() == InstructionData.__println_f) &&
-                (ins2.getData().getCategory() == InstructionCategory.PUT_NOCHANGE) &&
+                (ins2.getData().getCategory() == InstructionCategory.PUT) &&
                 (ins3.getData().getCategory() == InstructionCategory.INVOKE)
         ){
             if(InvokeAnalyze.parameters(ins3) == 1){

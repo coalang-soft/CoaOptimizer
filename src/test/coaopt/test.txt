@@ -1,6 +1,8 @@
+load println
 load java
-putS java.lang.System
-__invoke1
-get out
-get println
+putS javax.swing.JFrame
+invoke 1
+get EXIT_ON_CLOSE
+get 8
+invoke 1
 pop

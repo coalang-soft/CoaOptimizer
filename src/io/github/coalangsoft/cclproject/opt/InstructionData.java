@@ -6,11 +6,12 @@ package io.github.coalangsoft.cclproject.opt;
 public enum InstructionData {
 
     UNKNOWN(null),
-    pop(InstructionCategory.POP_NOUSE),
-    putI(InstructionCategory.PUT_NOCHANGE), putA(InstructionCategory.PUT_NOCHANGE), putS(InstructionCategory.PUT_NOCHANGE),
+    pop(InstructionCategory.POP),
+    putI(InstructionCategory.PUT), putA(InstructionCategory.PUT), putS(InstructionCategory.PUT),
     __invoke0(InstructionCategory.INVOKE), __invoke1(InstructionCategory.INVOKE), __invoke2(InstructionCategory.INVOKE),
     load(InstructionCategory.LOAD), invoke(InstructionCategory.INVOKE),
-    __println_f(InstructionCategory.PUT_NOCHANGE), get(InstructionCategory.GET), __float(InstructionCategory.PUT_NOCHANGE);
+    __println_f(InstructionCategory.PUT), get(InstructionCategory.GET), __float(InstructionCategory.PUT),
+    __java(InstructionCategory.JAVA);
 
     private final InstructionCategory category;
 
