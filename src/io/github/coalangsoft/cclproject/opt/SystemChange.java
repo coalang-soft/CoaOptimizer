@@ -47,4 +47,15 @@ public class SystemChange {
     public void setPrintlnChanged(boolean printlnChanged) {
         this.printlnChanged = printlnChanged;
     }
+
+    @Override
+    public String toString() {
+        return "SystemChange{" +
+                "forChanged=" + forChanged +
+                ", whileChanged=" + whileChanged +
+                ", ifChanged=" + ifChanged +
+                ", javaChanged=" + javaChanged +
+                ", printlnChanged=" + printlnChanged +
+                '}';
+    }
 }

@@ -2,6 +2,7 @@ package io.github.coalangsoft.cclproject.opt;
 
 import io.github.coalangsoft.cclproject.opt.analyze.InvokeAnalyze;
 import io.github.coalangsoft.cclproject.opt.module.OptimizeRule;
+import io.github.coalangsoft.cclproject.opt.systems.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,6 +14,16 @@ import java.util.List;
 public class InstructionOptimizer {
 
     private final OptimizeRule[] rules;
+
+    public static final InstructionOptimizer DEFAULT = new InstructionOptimizer(
+            new FloatOPT(),
+            new JavaOPT(),
+            new PrintlnInvokeOPT(),
+            new PrintlnLoadOPT(),
+            new PutPopOPT(),
+            new JavaConstantOPT(),
+            new WhileOPT()
+    );
 
     public InstructionOptimizer(OptimizeRule... rules){
         this.rules = rules;

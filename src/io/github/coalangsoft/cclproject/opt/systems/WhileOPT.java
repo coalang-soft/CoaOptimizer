@@ -4,6 +4,7 @@ import io.github.coalangsoft.cclproject.opt.Instruction;
 import io.github.coalangsoft.cclproject.opt.InstructionCategory;
 import io.github.coalangsoft.cclproject.opt.InstructionData;
 import io.github.coalangsoft.cclproject.opt.SystemChange;
+import io.github.coalangsoft.cclproject.opt.analyze.InvokeAnalyze;
 import io.github.coalangsoft.cclproject.opt.module.KnownSizeOptimizeRule;
 
 import java.util.List;
@@ -29,6 +30,24 @@ public class WhileOPT extends KnownSizeOptimizeRule
 		i5 = instructions.get(4);
 		i6 = instructions.get(5);
 
+		if(i3.getData().getCategory() == InstructionCategory.INVOKE){
+			if(InvokeAnalyze.parameters(i3) != 1){
+				return null;
+			}
+		}else{
+			return null;
+		}
+		if(i5.getData().getCategory() == InstructionCategory.INVOKE){
+			if(InvokeAnalyze.parameters(i5) != 1){
+				return null;
+			}
+		}else{
+			return null;
+		}
+		if(i6.getData() != InstructionData.nnr2){
+			return null;
+		}
+
 		if (i1.getData().getCategory() == InstructionCategory.LOAD &&
 				i1.getParameter().equals("while") &&
 				!profile.isWhileChanged() &&
@@ -38,6 +57,11 @@ public class WhileOPT extends KnownSizeOptimizeRule
 					i2.getParameter().equals("1"))
 			{
 				return new Instruction[]{i4, new Instruction("__whiletrue")};
+			}
+
+			else if(i2.getData() == InstructionData.putI &&
+					i2.getParameter().equals("0")){
+				return new Instruction[0];
 			}
 		}
 

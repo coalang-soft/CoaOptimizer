@@ -11,4 +11,4 @@ putI 1
 __invoke1
 putM test.cl0
 __invoke1
-rnn2
+nnr2
