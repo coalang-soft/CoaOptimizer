@@ -1,61 +1,56 @@
 package io.github.coalangsoft.cclproject.opt;
 
+import java.util.HashMap;
+import java.util.function.Consumer;
+
 /**
  * Created by Matthias on 06.07.2017.
  *
  */
-public class SystemChange {
-
-    private boolean forChanged, whileChanged, ifChanged, javaChanged, printlnChanged;
+public class SystemChange extends HashMap<String,Boolean>{
 
     public boolean isForChanged() {
-        return forChanged;
+        return getOrDefault("for", false);
     }
 
     public void setForChanged(boolean forChanged) {
-        this.forChanged = forChanged;
+        put("for", forChanged);
     }
 
     public boolean isWhileChanged() {
-        return whileChanged;
+        return getOrDefault("while", false);
     }
 
     public void setWhileChanged(boolean whileChanged) {
-        this.whileChanged = whileChanged;
+        put("while", whileChanged);
     }
 
     public boolean isIfChanged() {
-        return ifChanged;
+        return getOrDefault("if", false);
     }
 
     public void setIfChanged(boolean ifChanged) {
-        this.ifChanged = ifChanged;
+        put("if", ifChanged);
     }
 
     public boolean isJavaChanged() {
-        return javaChanged;
+        return getOrDefault("java", false);
     }
 
     public void setJavaChanged(boolean javaChanged) {
-        this.javaChanged = javaChanged;
+        put("java", javaChanged);
     }
 
     public boolean isPrintlnChanged() {
-        return printlnChanged;
+        return getOrDefault("println", false);
     }
 
     public void setPrintlnChanged(boolean printlnChanged) {
-        this.printlnChanged = printlnChanged;
+        put("println", printlnChanged);
     }
 
-    @Override
-    public String toString() {
-        return "SystemChange{" +
-                "forChanged=" + forChanged +
-                ", whileChanged=" + whileChanged +
-                ", ifChanged=" + ifChanged +
-                ", javaChanged=" + javaChanged +
-                ", printlnChanged=" + printlnChanged +
-                '}';
+    public void modifyAll(Iterable<String> changed){
+        changed.forEach(s -> put(s,true));
     }
+
 }

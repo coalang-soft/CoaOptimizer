@@ -22,7 +22,13 @@ public class InstructionOptimizer {
             new PrintlnLoadOPT(),
             new PutPopOPT(),
             new JavaConstantOPT(),
-            new WhileOPT()
+            new WhileOPT(),
+            new ForNumOPT(),
+            new NumOperationOPT("add", (a,b) -> a+b),
+            new NumOperationOPT("mul", (a,b) -> a*b),
+            new NumOperationOPT("div", (a,b) -> a/b),
+            new NumOperationOPT("sub", (a,b) -> a-b),
+            new NumOperationOPT("equals", (a,b) -> a==b?1:0)
     );
 
     public InstructionOptimizer(OptimizeRule... rules){

@@ -22,12 +22,12 @@ public class FloatOPT extends KnownSizeOptimizeRule {
         Instruction ins2 = instructions.get(1);
 
         if(
-                (ins1.getData() == InstructionData.putI) &&
+                (ins1.isNumberPut()) &&
                 (ins2.getData() == InstructionData.get)
         ){
             try{
                 int dec = Integer.parseInt(ins2.getParameter());
-                return new Instruction[]{new Instruction("__float " + Double.parseDouble(ins1.getParameter() + "." + dec))};
+                return new Instruction[]{new Instruction("__float " + (int) ins1.getParameterAsDouble() + "." + dec)};
             }catch(NumberFormatException e){}
         }
         return null;

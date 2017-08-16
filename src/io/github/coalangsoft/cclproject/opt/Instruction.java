@@ -6,7 +6,7 @@ import java.util.Objects;
 /**
  * Created by Matthias on 06.07.2017.
  */
-public class Instruction {
+public class Instruction extends AbstractInstruction{
 
     private final String raw;
     private final String parameter;
@@ -40,9 +40,5 @@ public class Instruction {
 
     public String getParameter() {
         return parameter;
-    }
-
-    public String toString(){
-        return raw;
     }
 }

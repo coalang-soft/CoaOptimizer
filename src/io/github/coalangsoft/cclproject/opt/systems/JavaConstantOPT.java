@@ -34,7 +34,9 @@ public class JavaConstantOPT extends KnownSizeOptimizeRule {
                     if(f.getType() == int.class || f.getType() == byte.class || f.getType() == long.class || f.getType() == short.class){
                         return new Instruction[]{new Instruction("putI " + f.get(null))};
                     }
-
+                    if(f.getType() == double.class || f.getType() == float.class){
+                        return new Instruction[]{new Instruction("__float " + f.get(null))};
+                    }
                 }
             }catch(ClassNotFoundException e){
                 System.out.println("Warning: Class " + ins2.getParameter() + " not found at optimize time!");
