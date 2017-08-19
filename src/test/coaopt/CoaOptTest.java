@@ -36,7 +36,7 @@ public class CoaOptTest {
                 new PutPopOPT(),
                 new JavaConstantOPT(),
                 new WhileOPT()
-        ).optimize(c, is);
+        ).optimize(true, c, is);
         System.out.println(is);
 
         for(int i = 0; i < is.size(); i++){

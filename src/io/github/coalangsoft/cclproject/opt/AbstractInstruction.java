@@ -62,4 +62,13 @@ public abstract class AbstractInstruction {
     public boolean isNumberPut() {
         return InstructionAnalyze.isNumberPut(this);
     }
+
+    public boolean is(InstructionData... data) {
+        for(int i = 0; i < data.length; i++){
+            if(getData() == data[i]){
+                return true;
+            }
+        }
+        return false;
+    }
 }
