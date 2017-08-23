@@ -69,10 +69,11 @@ public class StaticRuntime {
                     stack.push(stack.pop().invoke(parameters6));
                     break;
                 }
+                case putA: stack.push(StaticValue.unknown()); break;
                 default: throw new RuntimeException(ins + "");
             }
 
-            System.out.println(stack);
+//            System.out.println(stack);
         }
 
         if(changed){
