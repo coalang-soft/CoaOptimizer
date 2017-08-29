@@ -3,6 +3,7 @@ package io.github.coalangsoft.cclproject.opt.staticrt;
 import ccl.csy.context.GlobalSettings;
 import io.github.coalangsoft.cclproject.opt.Instruction;
 import io.github.coalangsoft.cclproject.opt.InstructionData;
+import io.github.coalangsoft.cclproject.opt.SystemChange;
 import io.github.coalangsoft.lib.data.ImmutablePair;
 import io.github.coalangsoft.lib.log.TimeLogger;
 
@@ -52,12 +53,12 @@ public class StaticRuntime {
                     if(ins.getParameter().equals("bind")){
                         stack.push(new StaticValue(StaticType.PROPERTY_BIND, new StaticBindFunc(val4)));
                     }else{
-                        stack.push(StaticValue.unknown());
+                        stack.push(val4.property(StaticValue.string(ins.getParameter())));
                     }
                     break;
                 case pop: stack.pop(); break;
                 case __setvar: setVar(ins.getParameter()); break;
-                case __java: stack.push(StaticValue.unknown()); break;
+                case __java: stack.push(StaticValue.java(ins.getParameter())); break;
                 case putS: stack.push(StaticValue.string(ins.getParameter())); break;
                 case putM: stack.push(StaticValue.unknown()); break;
                 case nnr2: break;
@@ -69,11 +70,26 @@ public class StaticRuntime {
                     stack.push(stack.pop().invoke(parameters6));
                     break;
                 }
-                case putA: stack.push(StaticValue.unknown()); break;
+                case putA: stack.push(StaticValue.array()); break;
                 default: throw new RuntimeException(ins + "");
             }
 
-//            System.out.println(stack);
+            if(!stack.isEmpty()){
+                StaticValue current = stack.peek();
+                if(isConstant(current)){
+                    Instruction n = getConstant(current);
+                    if(n.getData() != ins.getData()){
+                        if(ins.getData() == InstructionData.get){
+                            instructions.add(i, new Instruction("pop"));
+                            instructions.set(i + 1, n);
+                            System.out.println(ins + ";" + n);
+                            changed = true;
+                        }
+                    }
+                }
+            }
+
+//          System.out.println(stack);
         }
 
         if(changed){
@@ -96,6 +112,8 @@ public class StaticRuntime {
                 switch(var.getValue().getType()){
                     case NUMBER: instructions.set(i, new Instruction("__float " + var.getValue().getCurrentValue())); return true;
                     case STRING: instructions.set(i, new Instruction("putS " + var.getValue().getCurrentValue())); return true;
+                    case JAVA_CLASS: instructions.set(i, new Instruction("__java " + ((Class<?>) var.getValue().getCurrentValue()).getName())); return true;
+                    case PRINTLN_FUNCTION: instructions.set(i, new Instruction("__println_f")); return true;
                     default: return false;
                 }
             }
@@ -125,6 +143,7 @@ public class StaticRuntime {
             case ERROR: return false;
             case UNDEFINED: return false;
             case PRINTLN_FUNCTION: return false;
+            case JAVA_CLASS: return false;
             default: throw new RuntimeException("Unexpected value type: " + val.getType());
         }
     }
@@ -143,6 +162,68 @@ public class StaticRuntime {
             if(var.getName().equals(name)){
                 variables.set(k, new StaticVariable(name, val));
             }
+        }
+    }
+
+    private static boolean isConstant(StaticValue val){
+        switch (val.getType()){
+            case JAVA_CLASS: return true;
+            case NUMBER: return true;
+            case PROPERTY_BIND: return false;
+            case STRING: return true;
+            case UNKNOWN: return false;
+            case VARIABLE: return isConstant(((StaticVariable) val.getCurrentValue()).getValue());
+            case BOUND: return false;
+            case PRINTLN_FUNCTION: return true;
+            case ERROR: return false;
+            case JAVA_OBJECT: return false;
+            case UNDEFINED: return true;
+            case ARRAY: return false;
+            default: throw new RuntimeException("Unexpected type: " + val);
+        }
+    }
+
+    private static boolean isPush(InstructionData dat){
+        switch(dat){
+            case putS: return true;
+            case load: return false;
+            case putM: return true;
+            case __float: return true;
+            case get: return false;
+            case nnr2: return false;
+            case putI: return true;
+            case __java: return true;
+            case putA: return true;
+            case UNKNOWN: return true;
+            case __invoke0: return false;
+            case __invoke1: return false;
+            case __invoke2: return false;
+            case __println_f: return true;
+            case invoke: return false;
+            case __mkvar: return false;
+            case __println_c: return false;
+            case __setvar: return false;
+            case invoke1: return false;
+            case pop: return false;
+            default: throw new RuntimeException("Unexpected type: " + dat);
+        }
+    }
+
+    private static Instruction getConstant(StaticValue v) {
+        switch(v.getType()){
+            case JAVA_CLASS: return new Instruction("__java " + ((Class<?>) v.getCurrentValue()).getName());
+            case NUMBER:{
+                double d = ((Number) v.getCurrentValue()).doubleValue();
+                if(d == (int) d){
+                    return new Instruction("putI " + (int) d);
+                }
+                return new Instruction("__float " + d);
+            }
+            case STRING: return new Instruction("putS " + v.getCurrentValue().toString());
+            case VARIABLE: return getConstant(((StaticVariable) v.getCurrentValue()).getValue());
+            case PRINTLN_FUNCTION: return new Instruction("__println_f");
+            case UNDEFINED: return new Instruction("__undefined");
+            default: throw new RuntimeException("Unexpected type: " + v);
         }
     }
 

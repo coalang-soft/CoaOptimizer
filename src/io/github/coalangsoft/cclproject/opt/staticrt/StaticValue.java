@@ -4,6 +4,9 @@ import ccl.rt.Value;
 import io.github.coalangsoft.cclproject.opt.utils.ArrayUtil;
 import io.github.coalangsoft.lib.data.ImmutablePair;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+
 public class StaticValue {
 
     private StaticType type = StaticType.UNKNOWN;
@@ -20,6 +23,15 @@ public class StaticValue {
 
     public Object getCurrentValue() {
         return currentValue;
+    }
+
+    public static StaticValue dynamicType(Object stuff){
+        if(stuff instanceof String){
+            return string((String) stuff);
+        }if(stuff instanceof Number){
+            return number(((Number) stuff).doubleValue());
+        }
+        throw new RuntimeException("Unexpected value: " + stuff);
     }
 
     public static StaticValue number(double num){
@@ -77,16 +89,44 @@ public class StaticValue {
                     throw new RuntimeException("The default println function without parameter does not work!");
                 }
             }
+            case JAVA_CLASS: {
+                return new StaticValue(StaticType.JAVA_OBJECT, currentValue);
+            }
+            case STRING: {
+                if(others.length == 0){
+                    return this;
+                }else if(others.length == 1){
+                    return property(others[0]);
+                }else{
+                    return unknown();
+                }
+            }
             default: throw new RuntimeException("Unhandled value type: " + type);
         }
     }
 
-    private StaticValue property(StaticValue other) {
+    public StaticValue property(StaticValue other) {
+        if(this.getType() == StaticType.VARIABLE){
+            return ((StaticVariable) getCurrentValue()).getValue().property(other);
+        }
         if(other.getType() == StaticType.STRING){
             if("bind".equals(other.getCurrentValue())){
                 return new StaticValue(StaticType.PROPERTY_BIND, new StaticBindFunc(this));
-            }else{
-                return unknown();
+            }if("type".equals(other.getCurrentValue())){
+                switch(getType()){
+                    case STRING: return string("string");
+                    case NUMBER: return string("number");
+                }
+            }if(getType() == StaticType.JAVA_CLASS || getType() == StaticType.JAVA_OBJECT){
+                try {
+                    Field f = ((Class<?>) getCurrentValue()).getField(other.getCurrentValue().toString());
+                    if(Modifier.isFinal(f.getModifiers()) && Modifier.isStatic(f.getModifiers())){
+                        f.setAccessible(true);
+                        return dynamicType(f.get(null));
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }if(other.getType() == StaticType.VARIABLE){
             return property(((StaticVariable) other.getCurrentValue()).getValue());
@@ -94,4 +134,16 @@ public class StaticValue {
         return unknown();
     }
 
+    public static StaticValue java(String clss) {
+        try {
+            Class<?> c = Class.forName(clss);
+            return new StaticValue(StaticType.JAVA_CLASS, c);
+        } catch (ClassNotFoundException e) {
+            return unknown();
+        }
+    }
+
+    public static StaticValue array() {
+        return new StaticValue(StaticType.ARRAY, null);
+    }
 }
