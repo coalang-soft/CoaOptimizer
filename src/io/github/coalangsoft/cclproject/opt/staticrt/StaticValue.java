@@ -2,6 +2,7 @@ package io.github.coalangsoft.cclproject.opt.staticrt;
 
 import ccl.rt.Value;
 import io.github.coalangsoft.cclproject.opt.utils.ArrayUtil;
+import io.github.coalangsoft.cclproject.opt.utils.NumberOperator;
 import io.github.coalangsoft.lib.data.ImmutablePair;
 
 import java.lang.reflect.Field;
@@ -101,6 +102,20 @@ public class StaticValue {
                     return unknown();
                 }
             }
+            case PROPERTY_PROPERTY: {
+                if(others.length == 1){
+                    return ((StaticValue) getCurrentValue()).property(others[0]);
+                }else{
+                    return unknown();
+                }
+            }
+            case NUMOP:
+                if(others.length == 2){
+                    if(others[0].type == StaticType.NUMBER && others[1].type == StaticType.NUMBER){
+                        return number(((NumberOperator) getCurrentValue()).operate((double) others[0].currentValue, (double) others[1].currentValue));
+                    }
+                }
+                return unknown();
             default: throw new RuntimeException("Unhandled value type: " + type);
         }
     }
@@ -117,6 +132,8 @@ public class StaticValue {
                     case STRING: return string("string");
                     case NUMBER: return string("number");
                 }
+            }if("property".equals(other.getCurrentValue())){
+                return new StaticValue(StaticType.PROPERTY_PROPERTY, this);
             }if(getType() == StaticType.JAVA_CLASS || getType() == StaticType.JAVA_OBJECT){
                 try {
                     Field f = ((Class<?>) getCurrentValue()).getField(other.getCurrentValue().toString());
@@ -145,5 +162,9 @@ public class StaticValue {
 
     public static StaticValue array() {
         return new StaticValue(StaticType.ARRAY, null);
+    }
+
+    public static StaticValue numOp(NumberOperator op) {
+        return new StaticValue(StaticType.NUMOP, op);
     }
 }

@@ -1,16 +1,15 @@
 package io.github.coalangsoft.cclproject.opt.staticrt;
 
 import ccl.csy.context.GlobalSettings;
-import io.github.coalangsoft.cclproject.opt.Instruction;
-import io.github.coalangsoft.cclproject.opt.InstructionData;
-import io.github.coalangsoft.cclproject.opt.SystemChange;
+import io.github.coalangsoft.cclproject.opt.*;
+import io.github.coalangsoft.cclproject.opt.utils.NumberOperator;
 import io.github.coalangsoft.lib.data.ImmutablePair;
 import io.github.coalangsoft.lib.log.TimeLogger;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class StaticRuntime {
+public class StaticRuntime implements INumberOperatorOptimizer{
 
     private List<StaticVariable> variables;
     private StaticStack stack;
@@ -26,6 +25,7 @@ public class StaticRuntime {
         for(int i = 0; i < instructions.size(); i++){
             Instruction ins = instructions.get(i);
             if(ins.getData() == InstructionData.UNKNOWN){
+                System.err.println(ins);
                 return changed;
             }
 
@@ -93,7 +93,7 @@ public class StaticRuntime {
         }
 
         if(changed){
-            new StaticRuntime().eval(instructions);
+            make().eval(instructions);
         }
         return changed;
     }
@@ -144,13 +144,13 @@ public class StaticRuntime {
             case UNDEFINED: return false;
             case PRINTLN_FUNCTION: return false;
             case JAVA_CLASS: return false;
+            case PROPERTY_PROPERTY: return false;
             default: throw new RuntimeException("Unexpected value type: " + val.getType());
         }
     }
 
     private void handleVariableInvoke(StaticValue val){
         if(canChangeVariables(val)){
-            new RuntimeException("Reset variables after invoking this: " + val).printStackTrace();
             resetVariables();
         }
     }
@@ -179,6 +179,8 @@ public class StaticRuntime {
             case JAVA_OBJECT: return false;
             case UNDEFINED: return true;
             case ARRAY: return false;
+            case PROPERTY_PROPERTY: return false;
+            case NUMOP: return false;
             default: throw new RuntimeException("Unexpected type: " + val);
         }
     }
@@ -227,4 +229,17 @@ public class StaticRuntime {
         }
     }
 
+    public void addNumOp(String name, NumberOperator op){
+        if(!GlobalSettings.changedVariables.contains(name)){
+            variables.add(new StaticVariable(name, StaticValue.numOp(op)));
+        }
+    }
+
+    public static StaticRuntime make() {
+        StaticRuntime rt = new StaticRuntime();
+
+        OptimizerSetup.initNumOps(rt);
+
+        return rt;
+    }
 }

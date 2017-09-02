@@ -4,6 +4,7 @@ import io.github.coalangsoft.cclproject.opt.analyze.InvokeAnalyze;
 import io.github.coalangsoft.cclproject.opt.module.OptimizeRule;
 import io.github.coalangsoft.cclproject.opt.staticrt.StaticRuntime;
 import io.github.coalangsoft.cclproject.opt.systems.*;
+import io.github.coalangsoft.cclproject.opt.utils.NumberOperator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,11 +13,11 @@ import java.util.List;
 /**
  * Created by Matthias on 06.07.2017.
  */
-public class InstructionOptimizer {
+public class InstructionOptimizer implements INumberOperatorOptimizer{
 
-    private final OptimizeRule[] rules;
+    private final ArrayList<OptimizeRule> rules;
 
-    public static final InstructionOptimizer DEFAULT = new InstructionOptimizer(
+    public static final InstructionOptimizer DEFAULT = OptimizerSetup.initNumOps(new InstructionOptimizer(
             new FloatOPT(),
             new JavaOPT(),
             new PrintlnInvokeOPT(),
@@ -28,17 +29,14 @@ public class InstructionOptimizer {
             new InvokeConstantOPT(),
             new NumInvokeOPT(),
             new IfOPT(),
-            new StringOperationOPT("concat", (a,b) -> a+b),
-            new NumOperationOPT("add", (a,b) -> a+b),
-            new NumOperationOPT("mul", (a,b) -> a*b),
-            new NumOperationOPT("div", (a,b) -> a/b),
-            new NumOperationOPT("sub", (a,b) -> a-b),
-            new NumOperationOPT("equals", (a,b) -> a==b?1:0),
-            new NumOperationOPT("pow", Math::pow)
-    );
+            new StringOperationOPT("concat", (a,b) -> a+b)
+    ));
 
-    public InstructionOptimizer(OptimizeRule... rules){
-        this.rules = rules;
+    public InstructionOptimizer(OptimizeRule... r){
+        rules = new ArrayList<OptimizeRule>();
+        for(int i = 0; i < r.length; i++){
+            rules.add(r[i]);
+        }
     }
 
     public void optimize(boolean optimizeVariables, SystemChange profile, ArrayList<Instruction> instructions){
@@ -48,8 +46,8 @@ public class InstructionOptimizer {
             for(int i = 0; i < instructions.size(); i++){
 
                 //Use rules
-                for(int k = 0; k < rules.length; k++){
-                    OptimizeRule rule = rules[k];
+                for(int k = 0; k < rules.size(); k++){
+                    OptimizeRule rule = rules.get(k);
                     Instruction[] res = rule.optimize(i,profile,instructions);
                     if(res != null){
                         //TODO add new
@@ -67,11 +65,15 @@ public class InstructionOptimizer {
             }
 
             if(optimizeVariables){
-                nextRun = new StaticRuntime().eval(instructions);
+                nextRun = StaticRuntime.make().eval(instructions);
             }else{
                 nextRun = false;
             }
         }
     }
 
+    @Override
+    public void addNumOp(String name, NumberOperator op) {
+        rules.add(new NumOperationOPT(name, op));
+    }
 }
