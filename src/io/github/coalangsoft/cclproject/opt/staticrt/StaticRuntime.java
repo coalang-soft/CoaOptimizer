@@ -145,6 +145,7 @@ public class StaticRuntime implements INumberOperatorOptimizer{
             case PRINTLN_FUNCTION: return false;
             case JAVA_CLASS: return false;
             case PROPERTY_PROPERTY: return false;
+            case NUMOP: return false;
             default: throw new RuntimeException("Unexpected value type: " + val.getType());
         }
     }
